@@ -74,11 +74,11 @@ multivariate means
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Two-sample Hotelling's T-squared test
+\item \code{hotelling.test(default)}: Two-sample Hotelling's T-squared test
 
-\item \code{formula}: Two-sample Hotelling's T-squared test
+\item \code{hotelling.test(formula)}: Two-sample Hotelling's T-squared test
+
 }}
-
 \examples{
 
 data(container.df)
@@ -130,6 +130,13 @@ Hotelling, H. (1931). ``The generalization of Student's ratio.''
   Campbell, G.P. and J. M. Curran (2009). ``The interpretation of elemental
   composition measurements from forensic glass evidence III.'' Science and
   Justice, 49(1),2-7.
+
+Phipson, B., & Smyth, G. K. (2010). Permutation P-values should
+  never be zero: calculating exact P-values when permutations are randomly
+  drawn. Statistical applications in genetics and molecular biology, 9(1).
+
+Hemerik, J., & Goeman, J. (2018). Exact testing with random
+  permutations. Test, 27(4), 811-825.
 }
 \seealso{
 hotelling.stat

@@ -264,6 +264,12 @@ hotelling.test = function(x, ...){
 }
 
 #' @describeIn hotelling.test Two-sample Hotelling's T-squared test
+#' @importFrom combinat combn
+#' @references Phipson, B., & Smyth, G. K. (2010). Permutation P-values should
+#'   never be zero: calculating exact P-values when permutations are randomly
+#'   drawn. Statistical applications in genetics and molecular biology, 9(1).
+#' @references Hemerik, J., & Goeman, J. (2018). Exact testing with random
+#'   permutations. Test, 27(4), 811-825.
 #' @export
 hotelling.test.default = function(x, y, shrinkage = FALSE, var.equal = TRUE, perm = FALSE,
                                   B = 10000, progBar = (perm && TRUE), ...){
@@ -285,29 +291,59 @@ hotelling.test.default = function(x, y, shrinkage = FALSE, var.equal = TRUE, per
     idx = 1:N
     X = rbind(x, y)
     
-    onePercent = floor(B / 100)
-    pb = NULL
-    if(progBar){
-      pb = txtProgressBar(min = 0, max = 100, initial = 0, style = 3)
-    }
-    j = 0
-    k = 0
-    
-    for(i in 1:B){
-      i1 = sample(idx, nx)
-      x1 = X[i1, ,drop=FALSE]
-      x2 = X[-i1, ,drop=FALSE]
-      
-      res[i] = hotelling.stat(x = x1, y = x2, shrinkage = shrinkage, var.equal = var.equal)$statistic
-      j = j + 1
-      if(j == onePercent && progBar){
-        k = k + 1
-        j = 0
-        setTxtProgressBar(pb, k)
+    B_all <- choose(N, nx)
+    if (B_all <= B) { 
+      res = rep(0, B_all)
+      # exhaustive enumeration of permutations
+      onePercent = floor(B_all / 100)
+      pb = NULL
+      if(progBar){
+        pb = txtProgressBar(min = 0, max = 100, initial = 0, style = 3)
       }
-    }
-    
-    pVal = (1 + sum(res >= T0))/(1 + B)
+      j = 0
+      k = 0
+      grp_1 = combinat::combn(N, nx)
+      for(i in seq_len(B_all)){
+        i1 = grp_1[, i]
+        x1 = X[i1, ,drop=FALSE]
+        x2 = X[-i1, ,drop=FALSE]
+        
+        res[i] = hotelling.stat(x = x1, y = x2, shrinkage = shrinkage, var.equal = var.equal)$statistic
+        j = j + 1
+        if(j == onePercent && progBar){
+          k = k + 1
+          j = 0
+          setTxtProgressBar(pb, k)
+        }
+      }
+      # identity permutation is already included
+      # so we don't need the '1+' and '>' here
+      # See section 2.2 in Hemerik et al 2018
+      pVal = (sum(res >= T0))/(B_all) 
+    } else {
+      onePercent = floor(B / 100)
+      pb = NULL
+      if(progBar){
+        pb = txtProgressBar(min = 0, max = 100, initial = 0, style = 3)
+      }
+      j = 0
+      k = 0
+      for(i in 1:B){
+        i1 = sample(idx, nx)
+        x1 = X[i1, ,drop=FALSE]
+        x2 = X[-i1, ,drop=FALSE]
+        
+        res[i] = hotelling.stat(x = x1, y = x2, shrinkage = shrinkage, var.equal = var.equal)$statistic
+        j = j + 1
+        if(j == onePercent && progBar){
+          k = k + 1
+          j = 0
+          setTxtProgressBar(pb, k)
+        }
+      }
+      pVal = (1 + sum(res >= T0))/(1 + B)
+      # See section 3.4 in Hemerik et al 2018
+    }      
     output = list(stats = stats, pval = pVal , results = res)
     class(output) = "hotelling.test"
     invisible(output)

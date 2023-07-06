@@ -51,13 +51,13 @@ Easily get summary statistics for each group present in the data
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Summary statistics for grouped data
+\item \code{summarise(default)}: Summary statistics for grouped data
 
-\item \code{formula}: Summary statistics for grouped data
+\item \code{summarise(formula)}: Summary statistics for grouped data
 
-\item \code{data.frame}: Summary statistics for grouped data
+\item \code{summarise(data.frame)}: Summary statistics for grouped data
+
 }}
-
 \examples{
 
 data(container.df)
