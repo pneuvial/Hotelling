@@ -307,7 +307,7 @@ hotelling.test.default = function(x, y, shrinkage = FALSE, var.equal = TRUE, per
       }
     }
     
-    pVal = sum(res > T0)/B
+    pVal = (1 + sum(res >= T0))/(1 + B)
     output = list(stats = stats, pval = pVal , results = res)
     class(output) = "hotelling.test"
     invisible(output)
